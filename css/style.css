@@ -1,7 +1,16 @@
+@font-face {
+  font-family: Hack;
+  src: url(/src/fonts/Hack-Bold.ttf);
+}
+
 body *, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+body {
+  font-family: Hack;
 }
 
 .container {
