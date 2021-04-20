@@ -7,17 +7,15 @@ class Sketch extends Engine {
     this._border = 0.25;
     this._show_fps = false;
     this._recording = false;
+    // init script
+    console.clear();
     this._capturer_started = false;
-
     this._capturer = new CCapture({
       framerate: 60,
       verbose: true,
       motionBlurFrames: true,
       format: "png",
     });
-
-    // init script
-    console.clear();
   }
 
   draw() {
