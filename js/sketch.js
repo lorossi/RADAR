@@ -3,7 +3,7 @@ class Sketch extends Engine {
     // parameters
     this._text = "RADAR".split("");
     this._cols = 100;
-    this._duration = 500;
+    this._duration = 300;
     this._border = 0.15;
     this._recording = false;
   }
@@ -60,7 +60,7 @@ class Sketch extends Engine {
     this.ctx.restore();
 
     if (this._recording) {
-      if (this.frameCount <= this._duration) this._capturer.capture(this._canvas);
+      if (this.frameCount < this._duration) this._capturer.capture(this._canvas);
       else {
         this._recording = false;
         this._capturer.stop();
@@ -76,7 +76,8 @@ const wrap = (value, min_val = 0, max_val = 1) => {
   return value;
 };
 
-const ease = x => 1 - Math.pow(1 - x, 3);
+const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+const easeOutQuadratic = x => 1 - Math.pow(1 - x, 2);
 
 const random_from_array = a => {
   return a[random_int(a.length)];

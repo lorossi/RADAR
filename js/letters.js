@@ -6,17 +6,17 @@ class Letter {
     this._char = char;
     this._phi = phi;
 
-    this._threshold = ease(Math.random());
-    this._alive = 1 - this._phi / (Math.PI * 2) > this._threshold;
+    this._threshold = easeOutCubic(Math.random());
+    this._alive = false;
   }
 
   show(ctx, percent) {
     // percent accounting to position
-    const adjusted_percent = 1 - wrap(this._phi - Math.PI * 2 * percent, 0, Math.PI * 2) / (Math.PI * 2);
+    const adjusted_percent = easeOutQuadratic(1 - wrap(this._phi - Math.PI * 2 * percent, 0, Math.PI * 2) / (Math.PI * 2));
 
     if (!this._alive) {
       if (adjusted_percent > this._threshold) this._alive = true;
-      return;
+      else return;
     }
 
     // check for aliveness 
