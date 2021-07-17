@@ -15,7 +15,9 @@ class Sketch extends Engine {
     this._capturer = new CCapture({
       format: "png",
     });
-
+    // calculate offset
+    this._offset = this.frameCount;
+    this._bias = Math.random();
     // create all teh letters
     this._letters = [];
     const scl = this.width / this._cols;
@@ -42,7 +44,7 @@ class Sketch extends Engine {
     }
 
     // calculate percent and  border displacement
-    const percent = (this.frameCount % this._duration) / this._duration;
+    const percent = wrap((this.frameCount - this._offset) / this._duration + this._bias);
     const displacement = Math.floor(this._border * this.width / 2);
 
     // move and scale to accomodate center
@@ -67,6 +69,10 @@ class Sketch extends Engine {
         this._capturer.save();
       }
     }
+  }
+
+  click() {
+    this.setup();
   }
 }
 
