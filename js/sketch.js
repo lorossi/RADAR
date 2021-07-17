@@ -16,6 +16,7 @@ class Sketch extends Engine {
       format: "png",
     });
 
+    // create all teh letters
     this._letters = [];
     const scl = this.width / this._cols;
     for (let y = -this._cols / 2; y < this._cols / 2; y++) {
@@ -40,14 +41,17 @@ class Sketch extends Engine {
       this._capturer.start();
     }
 
+    // calculate percent and  border displacement
     const percent = (this.frameCount % this._duration) / this._duration;
-    const displacement = Math.floor(this._border * this.width / 2); // border displacement
+    const displacement = Math.floor(this._border * this.width / 2);
 
+    // move and scale to accomodate center
     this.ctx.save();
     this.background(0);
     this.ctx.translate(displacement, displacement);
     this.ctx.scale(1 - this._border, 1 - this._border);
 
+    // draw and move letters
     this.ctx.save();
     this._ctx.translate(this.width / 2, this.height / 2);
     this._letters.forEach(l => l.show(this.ctx, percent));
@@ -72,7 +76,7 @@ const wrap = (value, min_val = 0, max_val = 1) => {
   return value;
 };
 
-const ease = x => 1 - Math.pow(1 - x, 1.5);
+const ease = x => 1 - Math.pow(1 - x, 3);
 
 const random_from_array = a => {
   return a[random_int(a.length)];
