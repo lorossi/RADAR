@@ -1,21 +1,37 @@
 class Sketch extends Engine {
-  setup() {
+  preload() {
     // parameters
-    this._letters = "ECHOINGREFLECTIONS".split("");
-    this._cols = 50;
-    this._duration = 150;
-    this._border = 0.25;
-    this._show_fps = false;
+    this._text = "RADAR".split("");
+    this._cols = 100;
+    this._duration = 500;
+    this._border = 0.15;
     this._recording = false;
+  }
+
+  setup() {
     // init script
     console.clear();
     this._capturer_started = false;
     this._capturer = new CCapture({
-      framerate: 60,
-      verbose: true,
-      motionBlurFrames: true,
       format: "png",
     });
+
+    this._letters = [];
+    const scl = this.width / this._cols;
+    for (let y = -this._cols / 2; y < this._cols / 2; y++) {
+      for (let x = -this._cols / 2; x < this._cols / 2; x++) {
+        // too far from center
+        if (Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) >= this._cols / 4) continue;
+        // calculate angle relative to center
+        const phi = wrap(Math.atan2(y, x), 0, Math.PI * 2);
+        // select letter. I'm not sold on the randomness
+        const char = random_from_array(this._text);
+        // create new letter and push it to array
+        const nl = new Letter(x, y, scl, char, phi);
+        this._letters.push(nl);
+        // increment letter counter
+      }
+    }
   }
 
   draw() {
@@ -24,65 +40,23 @@ class Sketch extends Engine {
       this._capturer.start();
     }
 
-    const scl = (this._width * (1 - this._border)) / this._cols;
-    const rho = (this._frameCount / this._duration) * (2 * Math.PI) % (2 * Math.PI);
+    const percent = (this.frameCount % this._duration) / this._duration;
+    const displacement = Math.floor(this._border * this.width / 2); // border displacement
 
-    this._ctx.save();
+    this.ctx.save();
     this.background(0);
-    this._ctx.translate(this._width / 2, this._height / 2);
+    this.ctx.translate(displacement, displacement);
+    this.ctx.scale(1 - this._border, 1 - this._border);
 
-    let current_letter = 0;
-    for (let y = -this._cols / 2; y < this._cols / 2; y++) {
-      for (let x = -this._cols / 2; x < this._cols / 2; x++) {
-        // maths is strange sometimes
-        // i don't get why it's not cols/2
-        // but ok, it works
-        if (Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) >= this._cols / 4) continue;
+    this.ctx.save();
+    this._ctx.translate(this.width / 2, this.height / 2);
+    this._letters.forEach(l => l.show(this.ctx, percent));
+    this.ctx.restore();
 
-        // angles computation and wrapping
-        let phi = Math.atan2(y, x);
-        if (phi < 0) phi += 2 * Math.PI;
-        if (phi > 2 * Math.PI) phi -= 2 * Math.PI;
-
-        let diff = rho - phi;
-        if (diff < 0) diff += 2 * Math.PI;
-        if (diff > 2 * Math.PI) diff -= 2 * Math.PI;
-
-        // rounding to increase performance - it can run at a steady 60fps
-        const percent = this.easeOut(diff / (Math.PI * 2));
-        const size = this.roundInt(percent * scl * 1.75);
-        const alpha = percent;
-        const tx = parseInt(x * scl);
-        const ty = parseInt(y * scl);
-
-        // drawing
-        this._ctx.save();
-        this._ctx.translate(tx, ty);
-        this._ctx.font = `${size}px Hack`;
-        this._ctx.textAlign = "start";
-        this._ctx.textBaseline = "alphabetic";
-        this._ctx.fillStyle = `rgba(220, 220, 220, ${alpha})`;
-        this._ctx.fillText(this._letters[current_letter], tx, ty);
-        this._ctx.restore();
-
-        // update current letter
-        current_letter = (current_letter + 1) % this._letters.length;
-      }
-    }
-
-    this._ctx.restore();
-
-    // show FPS
-    if (this._show_fps) {
-      this._ctx.save();
-      this._ctx.fillStyle = "red";
-      this._ctx.font = "30px Hack";
-      this._ctx.fillText(parseInt(this._frameRate), 40, 40);
-      this._ctx.restore();
-    }
+    this.ctx.restore();
 
     if (this._recording) {
-      if (this._frameCount <= this._duration) this._capturer.capture(this._canvas);
+      if (this.frameCount <= this._duration) this._capturer.capture(this._canvas);
       else {
         this._recording = false;
         this._capturer.stop();
@@ -90,12 +64,22 @@ class Sketch extends Engine {
       }
     }
   }
-
-  easeOut(x) {
-    return Math.sin((x * Math.PI) / 2);
-  }
-
-  roundInt(x, precision = 2) {
-    return Math.ceil(x / precision) * precision;
-  }
 }
+
+const wrap = (value, min_val = 0, max_val = 1) => {
+  while (value > max_val) value -= max_val - min_val;
+  while (value < min_val) value += max_val - min_val;
+  return value;
+};
+
+const ease = x => 1 - Math.pow(1 - x, 1.5);
+
+const random_from_array = a => {
+  return a[random_int(a.length)];
+};
+
+const random_int = (a, b) => {
+  if (a == undefined && b == undefined) return random_int(0, 2);
+  else if (b == undefined) return random_int(0, a);
+  else if (a != undefined && b != undefined) return Math.floor(Math.random() * (b - a)) + a;
+};
