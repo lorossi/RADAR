@@ -2,9 +2,9 @@ class Sketch extends Engine {
   preload() {
     // parameters
     this._text = "RADAR".split("");
-    this._cols = 100;
-    this._duration = 300;
-    this._border = 0.15;
+    this._cols = 80;
+    this._duration = 450;
+    this._border = 0.2;
     this._recording = false;
   }
 
@@ -18,7 +18,7 @@ class Sketch extends Engine {
     // calculate offset
     this._offset = this.frameCount;
     this._bias = Math.random();
-    // create all teh letters
+    // create all the letters
     this._letters = [];
     const scl = this.width / this._cols;
     for (let y = -this._cols / 2; y < this._cols / 2; y++) {
@@ -62,7 +62,7 @@ class Sketch extends Engine {
     this.ctx.restore();
 
     if (this._recording) {
-      if (this.frameCount < this._duration) this._capturer.capture(this._canvas);
+      if (this.frameCount <= this._duration) this._capturer.capture(this._canvas);
       else {
         this._recording = false;
         this._capturer.stop();
@@ -82,8 +82,7 @@ const wrap = (value, min_val = 0, max_val = 1) => {
   return value;
 };
 
-const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
-const easeOutQuadratic = x => 1 - Math.pow(1 - x, 2);
+const ease = x => -(Math.cos(Math.PI * x) - 1) / 2;
 
 const random_from_array = a => {
   return a[random_int(a.length)];
