@@ -12,7 +12,8 @@ class Letter {
 
   show(ctx, percent) {
     // percent accounting to position
-    const position_percent = wrap(this._phi - Math.PI * 2 * percent, 0, Math.PI * 2) / (Math.PI * 2);
+    const position_percent =
+      wrap(this._phi - Math.PI * 2 * percent, 0, Math.PI * 2) / (Math.PI * 2);
     const adjusted_percent = ease(position_percent);
     // check aliveness
     this._alive = adjusted_percent > this._threshold;
@@ -24,7 +25,7 @@ class Letter {
     if (size % 2 != 0) size++;
     // text adjustment
     const alpha = adjusted_percent * 0.5 + 0.5;
-    const channel = 200 * adjusted_percent + 30;
+    const channel = 180 * adjusted_percent + 20;
     // round for better performance
     const tx = Math.floor(this._x * this._scl);
     const ty = Math.floor(this._y * this._scl);

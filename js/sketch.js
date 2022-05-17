@@ -5,7 +5,7 @@ class Sketch extends Engine {
     this._cols = 80;
     this._duration = 450;
     this._border = 0.2;
-    this._recording = false;
+    this._recording = true;
   }
 
   setup() {
@@ -21,14 +21,16 @@ class Sketch extends Engine {
     // create all the letters
     this._letters = [];
     const scl = this.width / this._cols;
+    let count = 0;
     for (let y = -this._cols / 2; y < this._cols / 2; y++) {
       for (let x = -this._cols / 2; x < this._cols / 2; x++) {
         // too far from center
-        if (Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) >= this._cols / 4) continue;
+        if (Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) >= this._cols / 4)
+          continue;
         // calculate angle relative to center
         const phi = wrap(Math.atan2(y, x), 0, Math.PI * 2);
         // select letter. I'm not sold on the randomness
-        const char = random_from_array(this._text);
+        const char = this._text[++count % this._text.length];
         // create new letter and push it to array
         const nl = new Letter(x, y, scl, char, phi);
         this._letters.push(nl);
@@ -44,8 +46,10 @@ class Sketch extends Engine {
     }
 
     // calculate percent and  border displacement
-    const percent = wrap((this.frameCount - this._offset) / this._duration + this._bias);
-    const displacement = Math.floor(this._border * this.width / 2);
+    const percent = wrap(
+      (this.frameCount - this._offset) / this._duration + this._bias
+    );
+    const displacement = Math.floor((this._border * this.width) / 2);
 
     // move and scale to accomodate center
     this.ctx.save();
@@ -56,13 +60,14 @@ class Sketch extends Engine {
     // draw and move letters
     this.ctx.save();
     this._ctx.translate(this.width / 2, this.height / 2);
-    this._letters.forEach(l => l.show(this.ctx, percent));
+    this._letters.forEach((l) => l.show(this.ctx, percent));
     this.ctx.restore();
 
     this.ctx.restore();
 
     if (this._recording) {
-      if (this.frameCount <= this._duration) this._capturer.capture(this._canvas);
+      if (this.frameCount <= this._duration)
+        this._capturer.capture(this._canvas);
       else {
         this._recording = false;
         this._capturer.stop();
@@ -82,14 +87,4 @@ const wrap = (value, min_val = 0, max_val = 1) => {
   return value;
 };
 
-const ease = x => -(Math.cos(Math.PI * x) - 1) / 2;
-
-const random_from_array = a => {
-  return a[random_int(a.length)];
-};
-
-const random_int = (a, b) => {
-  if (a == undefined && b == undefined) return random_int(0, 2);
-  else if (b == undefined) return random_int(0, a);
-  else if (a != undefined && b != undefined) return Math.floor(Math.random() * (b - a)) + a;
-};
+const ease = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
