@@ -6,11 +6,17 @@ class Letter {
     this._char = char;
     this._phi = phi;
 
+    this._palette = ["#FF00FF", "#00FFFF", "#FFFFFF"];
+    // color aberration position
+    this._d_pos = [-1, 1, 0];
+
     this._threshold = Math.random();
     this._alive = false;
   }
 
   show(ctx, percent) {
+    // color aberration palette
+
     // percent accounting to position
     const position_percent =
       wrap(this._phi - Math.PI * 2 * percent, 0, Math.PI * 2) / (Math.PI * 2);
@@ -25,7 +31,7 @@ class Letter {
     if (size % 2 != 0) size++;
     // text adjustment
     const alpha = adjusted_percent * 0.5 + 0.5;
-    const channel = 180 * adjusted_percent + 20;
+    const hex_alpha = dec_to_hex(alpha * 255);
     // round for better performance
     const tx = Math.floor(this._x * this._scl);
     const ty = Math.floor(this._y * this._scl);
@@ -33,11 +39,21 @@ class Letter {
     // drawing
     ctx.save();
     ctx.translate(tx, ty);
+    ctx.globalCompositeOperation = "screen";
     ctx.font = `${size}px Hack`;
     ctx.textAlign = "start";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = `rgba(${channel}, ${channel}, ${channel}, ${alpha})`;
-    ctx.fillText(this._char, tx, ty);
+
+    for (let i = 0; i < this._d_pos.length; i++) {
+      const d_pos = this._d_pos[i];
+      const color = this._palette[i] + hex_alpha;
+      ctx.fillStyle = color;
+      ctx.fillText(this._char, tx + d_pos, ty + d_pos);
+    }
+
     ctx.restore();
   }
 }
+
+const dec_to_hex = (dec) =>
+  Math.floor(dec).toString(16).padStart(2, 0).toUpperCase();

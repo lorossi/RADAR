@@ -16,11 +16,11 @@ Take a look at the output video on my [Instagram account](https://www.instagram.
 
 A few images and a choppy GIF are also a little bit lower on this page as well.
 
-![image-1](output/0000088.png)
+![image-1](output/0000047.png)
 
-![image-2](output/0000236.png)
+![image-2](output/0000136.png)
 
-![image-3](output/0000320.png)
+![image-3](output/0000394.png)
 
 ![gif](output/output.gif)
 

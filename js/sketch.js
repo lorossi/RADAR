@@ -5,7 +5,7 @@ class Sketch extends Engine {
     this._cols = 80;
     this._duration = 450;
     this._border = 0.2;
-    this._recording = true;
+    this._recording = false;
   }
 
   setup() {
